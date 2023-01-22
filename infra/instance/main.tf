@@ -101,7 +101,7 @@ resource "aws_eip" "dot-eip" {
 }
 
 resource "aws_s3_bucket" "dot-bucket" {
-  bucket = "dot-var.BUCKET_ID"
+  bucket = var.BUCKET_ID
   acl    = "public-read"
   policy = file("policy.json")
 

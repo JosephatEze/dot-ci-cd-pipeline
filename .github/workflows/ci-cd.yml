@@ -68,7 +68,7 @@ jobs:
 
     - name: Terraform Plan
       id: plan
-      run: terraform plan -no-color -var BUCKET_ID=${{ github.run_id }}
+      run: terraform plan -no-color 
       working-directory: infra/instance/
       continue-on-error: true
     
@@ -111,11 +111,11 @@ jobs:
     - name: Terraform Apply
       id: apply
       working-directory: infra/instance/
-      run: terraform apply -auto-approve -var BUCKET_ID = ${{ github.run_id}}
-    - name: Terraform Output
-      id: apply_output
-      working-directory: infra/instance/
-      run: terraform output -raw -no-color ${{ steps.create_resource_file.outputs.RESOURCE_NAME }}
+      run: terraform apply -auto-approve 
+    #- name: Terraform Output
+      #id: apply_output
+      #working-directory: infra/instance/
+      #run: terraform output -raw -no-color ${{ steps.create_resource_file.outputs.RESOURCE_NAME }}
 
       - name: Get outputs
         uses: dflook/terraform-output@v1
