@@ -107,7 +107,7 @@ jobs:
     - name: Terraform Plan Status
       if: create.plan.outcome == 'failure'
       run: exit 1
-      
+
     - name: Terraform Apply
       id: apply
       working-directory: infra/instance/
@@ -117,16 +117,19 @@ jobs:
       #working-directory: infra/instance/
       #run: terraform output -raw -no-color ${{ steps.create_resource_file.outputs.RESOURCE_NAME }}
 
-      - name: Get outputs
-        uses: dflook/terraform-output@v1
-        id: tf-outputs
-        with:
-          path: infra/instance/
-      - name: Print the hostname
-        run: echo "The hostname is ${{ create.tf-outputs.outputs.dot_server_dns }}"
-        run: echo "The hostname is ${{ create.tf-outputs.outputs.dot_bucket_id }}"
-        run: echo "The hostname is ${{ create.tf-outputs.outputs.dot_bucket_domain_name}}"
-        run: echo "The hostname is ${{ create.tf-outputs.outputs.dot_bucket_website_endpoint }}"
+    - name: Get outputs
+      uses: dflook/terraform-output@v1
+      id: tf-outputs
+      with:
+        path: infra/instance/
+    - name: Print the server_dns
+      run: echo "The server_dns is ${{ create.tf-outputs.outputs.dot_server_dns }}"
+    - name: Print the bucket_id
+      run: echo "The bucket_id is ${{ create.tf-outputs.outputs.dot_bucket_id }}"
+    - name: Print the bucket_domain_name
+      run: echo "Thebucket_domain_name is ${{ create.tf-outputs.outputs.dot_bucket_domain_name}}"
+    - name: Print the bucket_website_endpoint
+      run: echo "The bucket_website_endpoint is ${{ create.tf-outputs.outputs.dot_bucket_website_endpoint }}"
     
     # ======================================================
     # If everything goes well and the Terraform Plan was
@@ -216,22 +219,22 @@ jobs:
     # When we're done, we need to update the PR one more time
     # with the results of the apply.
     # ======================================================      
-    - name: Update status
-      uses: actions/github-script@v5
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const output = `#### server created
-          > job ${{ github.run_id }} has been deployed successfully
+      - name: Update status
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### server created
+            > job ${{ github.run_id }} has been deployed successfully
           
-          URL: http://${{ steps.apply_output.outputs.stdout }}`;
+            URL: http://${{ steps.apply_output.outputs.stdout }}`;
 
-          github.rest.issues.createComment({
-            issue_number: ${{ github.event.inputs.PR_number }},
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: output
-          })
+            github.rest.issues.createComment({
+              issue_number: ${{ github.event.inputs.PR_number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
 
      
 
@@ -243,8 +246,8 @@ jobs:
     #
     # Otherwise this step will not be executed.
     # ======================================================
-    - name: Setup tmate session
-      if: ${{ failure() }}
-      uses: mxschmitt/action-tmate@v3
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
 
      
