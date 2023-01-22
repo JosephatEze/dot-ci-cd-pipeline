@@ -1,0 +1,251 @@
+name: Dot CI-CD pipeline
+
+on:
+  workflow_dispatch:
+    #inputs:
+     # PR_number:
+       # description: 'Pull request number'
+       # required: true
+
+jobs:
+  create:
+    name: 'Create and configure ec2 instance'
+    defaults:
+      run:
+        shell: bash
+    runs-on: ubuntu-latest
+    steps:
+
+    # ======================================================
+    # Checkout the branch infrastructure and the repository
+    # ======================================================
+    - uses: actions/checkout@v2
+      name: 'Checkout repository and infrastructure branch'
+      with:
+        ref: main
+
+    # ======================================================
+    # Terraform setup
+    # 
+    # - secrets.TERRAFORM_API_TOKEN: is the Terraform
+    # Cloud API Token.
+    # ======================================================
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.11
+        cli_config_credentials_token: ${{ secrets.TERRAFORM_API_TOKEN }}
+       # args: '-var="BUCKET_ID=dev"'
+    
+    # ======================================================
+    # We need to create a new Terraform resource file and for
+    # this we can use the `create_resource.sh` and passing
+    #
+    # 
+    # The script returns a JSON string of the format: 
+    # {
+    #   "resource_file": "extra_staging_'${resource_id}'.tf", 
+    #   "terraform_expected_output": "staging_dns_'${resource_id}'"
+    # }
+    #
+    # We use jq to pull out the value of `terraform_expected_output`
+    # as we will need it later to fetch the hostname of the
+    # staging server
+    # ======================================================
+    #- name: 'Create environment resource file'
+     # id: create_resource_file
+     # working-directory: infrastructure/instance/
+     #run: |
+       # OUTPUT="$(./create_resource.sh ec2_server | jq -r .terraform_expected_output)"
+       # echo "::set-output name=RESOURCE_NAME::$OUTPUT"
+        
+    - name: Terraform Init and Validate
+      id: init
+      working-directory: infra/instance/
+      run: |
+        terraform init
+        terraform validate -no-color
+
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -no-color -var BUCKET_ID="${{ github.run_id }}"
+      working-directory: infra/instance/
+      continue-on-error: true
+    
+    # ======================================================
+    # Once Terraform Plan is completed we need to update
+    # the PR with the results of the plan
+    # ======================================================
+    #- name: Update Pull Request
+     # uses: actions/github-script@v5
+     # env:
+       # PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+      #with:
+       # github-token: ${{ secrets.GITHUB_TOKEN }}
+        #script: |
+         # const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+         # <details><summary>Show Plan</summary>
+
+          #\`\`\`\n
+         # ${process.env.PLAN}
+         # \`\`\`
+
+         # </details>
+
+         # *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+          #github.rest.issues.createComment({
+          #  issue_number: ${{ github.event.inputs.run_number }},
+           #issue_number: ${{ github.event.inputs.PR_number }},
+           # owner: context.repo.owner,
+            #repo: context.repo.repo,
+            #body: output
+          #})
+          
+    - name: Terraform Plan Status
+      if: steps.plan.outcome == 'failure'
+      run: exit 1
+
+    - name: Terraform Apply
+      id: apply
+      working-directory: infra/instance/
+      run: terraform apply -auto-approve -var BUCKET_ID="${{ github.run_id }}"
+      
+    - name: Terraform Output
+      id: apply_output
+      working-directory: infra/instance/
+      run: terraform output -raw -no-color ${{ steps.create_resource_file.outputs.RESOURCE_NAME }}
+
+      - name: Get outputs
+        uses: dflook/terraform-output@v1
+        id: tf-outputs
+        with:
+          path: infra/instance/
+      - name: Print the hostname
+        run: echo "The hostname is ${{ create.tf-outputs.outputs.dot_server_dns }}"
+        run: echo "The hostname is ${{ create.tf-outputs.outputs.dot_bucket_id }}"
+        run: echo "The hostname is ${{ create.tf-outputs.outputs.dot_bucket_domain_name}}"
+        run: echo "The hostname is ${{ create.tf-outputs.outputs.dot_bucket_website_endpoint }}"
+    
+    # ======================================================
+    # If everything goes well and the Terraform Plan was
+    # executed successfully, and the resources were created
+    # we need to commit the new resource file and push it
+    # to the infra branch.
+    # 
+    # If we don't do this, everytime this workflow runs
+    # it will destroy the resources created by previous
+    # runs. We need to persist the state in the repository
+    # for this to work.
+    # 
+    # Here we use a neat little trick:
+    # git commit -m "Add terraform resource files" && \
+    #      git push || echo "Nothing to commit"
+    #
+    # git push will fail with a non-zero exit if there 
+    # are no changes to commit and this will cause the workflow
+    # to fail. We don't want that. We can use the `|| echo`
+    # to print "Nothing to commit" to the console if 
+    # git push fails.
+    # ======================================================
+    #- name: Commit terraform resource files to the PR
+      #working-directory: infrastructure/instance/
+     # run: |
+      #  git config --global user.name '${{ github.actor }}'
+       # git config --global user.email '${{ github.actor}}@gmail.com'
+       # git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+       # git add ./\*.tf
+       # git commit -m "Add terraform resource files" && \
+        #  git push || echo "Nothing to commit"
+    
+    # ======================================================
+    # Install dependencies in the server
+    # ======================================================
+    - uses: JimCronqvist/action-ssh@7737f1192ddd8376686e9d6354dea44592c942bf
+      name: Execute SSH commmands on remote server and install dependencies
+      with:
+        hosts: '${{ secrets.REMOTE_USER }}@${{ steps.apply_output.outputs.stdout }}'
+        privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+        command: |
+          #Install Ruby 2.0, Ruby Gem, Jekyll, awscli, on the server
+          sudo apt update
+          #sudo apt install ruby-full -y
+          sudo apt-get install ruby-full rubygems build-essential zlib1g-dev -y
+          gem install jekyll bundler -y
+
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          ./aws/install
+
+    - uses: JimCronqvist/action-ssh@7737f1192ddd8376686e9d6354dea44592c942bf
+      name: Execute SSH commmands on remote server and clone repository
+      with:
+        hosts: '${{ secrets.REMOTE_USER }}@${{ steps.apply_output.outputs.stdout }}'
+        privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+        command: |
+          git clone git@github.com:twbs/bootstrap.git
+          cd bootstrap 
+          jekyll build
+          cd _gh_pages
+          echo ${{github.job}} > version.txt
+          echo ${{github.run_number}} >> version.txt
+
+    #Delete s3 bucket on failure
+    - name: Delete s3 contents on failure
+      if: ${{ failure() }}
+      run: aws s3 rm "s3://dot-${{ github.run_id }} --recursive
+
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: shallwefootball/s3-upload-action@master
+        with:
+          aws_key_id: ${{ secrets.AWS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_bucket: dot-${{ github.run_id }}
+          source_dir: 'bootstrap'
+          destination_dir: ''
+
+
+
+
+    
+    # ======================================================
+    # When we're done, we need to update the PR one more time
+    # with the results of the apply.
+    # ======================================================      
+    - name: Update status
+      uses: actions/github-script@v5
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const output = `#### server created
+          > job ${{ github.run_id }} has been deployed successfully
+          
+          URL: http://${{ steps.apply_output.outputs.stdout }}`;
+
+          github.rest.issues.createComment({
+            issue_number: ${{ github.event.inputs.PR_number }},
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })
+
+     
+
+
+    # ======================================================
+    # tmate is a nice little utility that allows us to
+    # ssh to the server and execute commands
+    # on the server in case any of the steps above fail.
+    #
+    # Otherwise this step will not be executed.
+    # ======================================================
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
+
+     
