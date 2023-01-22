@@ -1,6 +1,6 @@
 terraform {
   backend "remote" {
-    organization = "dot"
+    organization = "dot-test"
 
     workspaces {
       name = "dot-ci-cd"
