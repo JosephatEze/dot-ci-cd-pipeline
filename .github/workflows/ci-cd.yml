@@ -127,7 +127,7 @@ jobs:
     - name: Print the bucket_id
       run: echo "The bucket_id is ${{ steps.tf-outputs.outputs.dot_bucket_id }}"
     - name: Print the bucket_domain_name
-      run: echo "Thebucket_domain_name is ${{ stepstf-outputs.outputs.dot_bucket_domain_name}}"
+      run: echo "Thebucket_domain_name is ${{ steps.tf-outputs.outputs.dot_bucket_domain_name}}"
     - name: Print the bucket_website_endpoint
       run: echo "The bucket_website_endpoint is ${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }}"
     
