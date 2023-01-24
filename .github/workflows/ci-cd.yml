@@ -105,7 +105,7 @@ jobs:
           #})
           
     - name: Terraform Plan Status
-      if: create.plan.outcome == 'failure'
+      if: steps.plan.outcome == 'failure'
       run: exit 1
 
     - name: Terraform Apply
