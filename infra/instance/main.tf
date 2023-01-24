@@ -3,7 +3,7 @@ terraform {
     organization = "dot-test"
 
     workspaces {
-      name = "dot-ci-cd"
+      name = "dot-ci-cd-1"
     }
   }
 
