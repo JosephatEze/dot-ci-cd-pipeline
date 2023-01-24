@@ -123,13 +123,13 @@ jobs:
       with:
         path: infra/instance/
     - name: Print the server_dns
-      run: echo "The server_dns is ${{ create.tf-outputs.outputs.dot_server_dns }}"
+      run: echo "The server_dns is ${{ steps.tf-outputs.outputs.dot_server_dns }}"
     - name: Print the bucket_id
-      run: echo "The bucket_id is ${{ create.tf-outputs.outputs.dot_bucket_id }}"
+      run: echo "The bucket_id is ${{ steps.tf-outputs.outputs.dot_bucket_id }}"
     - name: Print the bucket_domain_name
-      run: echo "Thebucket_domain_name is ${{ create.tf-outputs.outputs.dot_bucket_domain_name}}"
+      run: echo "Thebucket_domain_name is ${{ stepstf-outputs.outputs.dot_bucket_domain_name}}"
     - name: Print the bucket_website_endpoint
-      run: echo "The bucket_website_endpoint is ${{ create.tf-outputs.outputs.dot_bucket_website_endpoint }}"
+      run: echo "The bucket_website_endpoint is ${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }}"
     
     # ======================================================
     # If everything goes well and the Terraform Plan was
