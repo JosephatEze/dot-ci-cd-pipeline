@@ -1,5 +1,5 @@
 terraform {
-  cloud {
+  backend "remote" {
     organization = "dot-test"
 
     workspaces {
