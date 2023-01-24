@@ -7,6 +7,7 @@ terraform {
     }
   }
 
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -70,12 +71,29 @@ resource "aws_subnet" "dot-public_subnet" {
   }
 }
 
-resource "aws_key_pair" "dot_server_key" {
-  key_name   = "dot_server_key"
-  public_key = var.dot_server_public_key
+resource "aws_security_group" "allow_ssh" {
+  name        = "allow_ssh"
+  description = "Allow SSH inbound traffic"
+  vpc_id      = aws_vpc.vpc.id
+
+  ingress {
+    description      = "ssh from VPC"
+    from_port        = 22
+    to_port          = 22
+    protocol         = "ssh"
+    cidr_blocks      = [aws_vpc.vpc.cidr_block]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
 
   tags = {
-    "Name" = "dot_server_public_key"
+    Name = "allow_ssh"
   }
 }
 
@@ -87,12 +105,11 @@ resource "aws_eip_association" "eip_assoc" {
 resource "aws_instance" "dot_server" {
   ami                    = var.base_ami_id
   instance_type          = "t2.micro"
-  vpc_security_group_ids = ["sg-0d2411db69a112a30"]
-  key_name               = aws_key_pair.dot_server_key.key_name
+  vpc_security_group_ids = [aws_security_group.allow_ssh.id]
+  key_name               = var.public_key          
   subnet_id              = aws_subnet.dot-public_subnet.id
 
-  tags = {
-    "Name" = "dot_server"
+  tags = {"Name" = "dot_server"
   }
 }
 
@@ -100,26 +117,37 @@ resource "aws_eip" "dot-eip" {
   vpc = true
 }
 
+
+
 resource "aws_s3_bucket" "dot-bucket" {
   bucket = var.BUCKET_ID
   acl    = "public-read"
-  policy = file("policy.json")
+ 
 
   website {
     index_document = "index.html"
     error_document = "error.html"
-
-    routing_rules = <<EOF
-[{
-    "Condition": {
-        "KeyPrefixEquals": "docs/"
-    },
-    "Redirect": {
-        "ReplaceKeyPrefixWith": "documents/"
-    }
-}]
-EOF
   }
+}
+
+resource "aws_s3_bucket_policy" "public_read_access" {
+  bucket = aws_s3_bucket.dot-bucket.id
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+	  "Principal": "*",
+      "Action": [ "s3:*" ],
+      "Resource": [
+        "${aws_s3_bucket.dot-bucket.arn}",
+        "${aws_s3_bucket.dot-bucket.arn}/*"
+      ]
+    }
+  ]
+}
+EOF
 }
 
 output "dot_server_dns" {
