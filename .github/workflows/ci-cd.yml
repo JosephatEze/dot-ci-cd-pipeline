@@ -34,7 +34,7 @@ jobs:
       uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: 1.0.11
-        cli_config_credentials_token: ${{ secrets.TERRAFORM_API_TOKEN }}
+        cli_config_credentials_token: ${{ secrets.TERRAFORM_API_TOKEN}}
        # args: '-var="BUCKET_ID=dev"'
     
     # ======================================================
@@ -197,7 +197,7 @@ jobs:
     #Delete s3 bucket on failure
     - name: Delete s3 contents on failure
       if: ${{ failure() }}
-      run: aws s3 rm "s3://dot-${{ github.run_id }} --recursive
+      run: aws s3 rm "s3://dot-bucket-1234567890 --recursive
 
   upload:
     runs-on: ubuntu-latest
@@ -208,7 +208,8 @@ jobs:
         with:
           aws_key_id: ${{ secrets.AWS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          aws_bucket: dot-${{ github.run_id }}
+          aws_bucket: dot-bucket-1234567890
+          #aws_bucket: dot-${{ github.run_id }}
           source_dir: 'bootstrap'
           destination_dir: ''
 
