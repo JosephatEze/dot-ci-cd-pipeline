@@ -42,9 +42,6 @@ variable "base_ami_id" {
 resource "aws_vpc" "vpc" {
   cidr_block       = "10.0.0.0/16"
   instance_tenancy = "default"
-  enable_dns_support = "yes"
-  enable_dns_hostnames = "yes"
-
 
   tags = {
     Name        = "dot-vpc"
