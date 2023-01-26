@@ -172,12 +172,12 @@ jobs:
     - name: Execute SSH commmands on remote server and install dependencies
       uses: appleboy/ssh-action@v0.1.7
       with:
-        host: ${{ steps.tf-outputs.outputs.dot_server_ip }}
-        username: ubuntu
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        port: "22"
+        host: '${{ steps.tf-outputs.outputs.dot_server_dns }}'
+        username: 'ubuntu'
+        key: '${{ secrets.SSH_PRIVATE_KEY }}'
+        port: '22'
         script: |
-          w#Install Ruby 2.0, Ruby Gem, Jekyll, awscli, on the server
+          #Install Ruby 2.0, Ruby Gem, Jekyll, awscli, on the server
           sudo apt update -y
           #sudo apt install ruby-full -y
           sudo apt-get install ruby-full rubygems build-essential zlib1g-dev -y
