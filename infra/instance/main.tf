@@ -127,9 +127,9 @@ resource "aws_eip_association" "eip_assoc" {
 resource "aws_instance" "dot_server" {
   ami                    = var.base_ami_id
   instance_type          = "t2.micro"
-  vpc_security_group_ids = [aws_security_group.allow_ssh.id]
+  vpc_security_group_ids = ["sg-014e7d776fd09dab3"]
   key_name               = var.public_key          
-  subnet_id              = aws_subnet.dot-public_subnet.id
+  subnet_id              = "subnet-001e3a483390007de"
 
   tags = {"Name" = "dot_server"
   }
