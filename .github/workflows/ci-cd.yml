@@ -170,7 +170,7 @@ jobs:
     - uses: JimCronqvist/action-ssh@7737f1192ddd8376686e9d6354dea44592c942bf
       name: Execute SSH commmands on remote server and install dependencies
       with:
-        hosts: '${{ secrets.REMOTE_USER }}@$${{ steps.tf-outputs.outputs.dot_server_dns }}'
+        hosts: 'ubuntu@$${{ steps.tf-outputs.outputs.dot_server_dns }}'
         #hosts: '${{ secrets.REMOTE_USER }}@${{ steps.apply_output.outputs.stdout }}'
         privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
         command: |
@@ -187,7 +187,7 @@ jobs:
     - uses: JimCronqvist/action-ssh@7737f1192ddd8376686e9d6354dea44592c942bf
       name: Execute SSH commmands on remote server and clone repository
       with:
-        hosts: '${{ secrets.REMOTE_USER }}@${{ steps.apply_output.outputs.stdout }}'
+        hosts: 'ubuntu@$${{ steps.tf-outputs.outputs.dot_server_dns }}'
         privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
         command: |
           git clone git@github.com:twbs/bootstrap.git
@@ -196,11 +196,6 @@ jobs:
           cd _gh_pages
           echo ${{github.job}} > version.txt
           echo ${{github.run_number}} >> version.txt
-
-    #Delete s3 bucket on failure
-    - name: Delete s3 contents on failure
-      if: ${{ failure() }}
-      run: aws s3 rm "s3://dot-bucket-1234567890 --recursive
 
   upload:
     runs-on: ubuntu-latest
