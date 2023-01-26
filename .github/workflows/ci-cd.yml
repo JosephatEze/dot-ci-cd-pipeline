@@ -167,6 +167,24 @@ jobs:
     # ======================================================
     # Install dependencies in the server
     # ======================================================
+    - name: Execute SSH commmands on remote server and install dependencies
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: 'ubuntu@$${{ steps.tf-outputs.outputs.dot_server_dns }}'
+        username: ubuntu
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: "22"
+        script: |
+          w#Install Ruby 2.0, Ruby Gem, Jekyll, awscli, on the server
+          sudo apt update -y
+          #sudo apt install ruby-full -y
+          sudo apt-get install ruby-full rubygems build-essential zlib1g-dev -y
+          gem install jekyll bundler -y
+
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          ./aws/install
+
     - uses: JimCronqvist/action-ssh@7737f1192ddd8376686e9d6354dea44592c942bf
       name: Execute SSH commmands on remote server and install dependencies
       with:
