@@ -216,13 +216,13 @@ jobs:
          #  source_dir: 'bootstrap'  
          #  destination_dir: ''  
 
-    - name: Update deployment status (success)
-      if: success()
-      uses: chrnorm/deployment-status@releases/v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        target_url: https://${{ steps.tf-outputs.outputs.dot_server_dns }}
-        state: 'success'
+    #- name: Update deployment status (success)
+     # if: success()
+      #uses: chrnorm/deployment-status@releases/v1
+    #  with:
+      #  token: ${{ secrets.GITHUB_TOKEN }}
+      #  target_url: https://${{ steps.tf-outputs.outputs.dot_server_dns }}
+     #   state: 'success'
         #deployment_id: ${{ steps.test.outputs.deployment_id }}      
 
     
