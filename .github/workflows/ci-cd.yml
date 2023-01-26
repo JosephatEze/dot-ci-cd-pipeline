@@ -200,24 +200,26 @@ jobs:
           jekyll build
           cd _gh_pages
           echo ${{github.job}} > version.txt
-          echo ${{github.run_number}} >> version.txt     
-
-  upload:
-    runs-on: ubuntu-latest
-    needs: create
-    steps:
-      - uses: actions/checkout@master
-      - uses: shallwefootball/s3-upload-action@master
+          echo ${{github.run_number}} >> version.txt 
+    
+    - uses: shallwefootball/s3-upload-action@master
+        name: Upload S3
+        id: S3
         with:
           aws_key_id: ${{ secrets.AWS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: dot-bucket-1234567890
-          #aws_bucket: dot-${{ github.run_id }}
-          source_dir: 'bootstrap'
-          destination_dir: ''
+          source_dir: 'bootstrap'  
+          destination_dir: ''  
 
-
-
+    - name: Update deployment status (success)
+      if: success()
+      uses: chrnorm/deployment-status@releases/v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        target_url: https://${{ steps.tf-outputs.outputs.dot_server_dns }}
+        state: 'success'
+        #deployment_id: ${{ steps.test.outputs.deployment_id }}      
 
     
     # ======================================================
