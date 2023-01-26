@@ -172,7 +172,7 @@ jobs:
     - name: Execute SSH commmands on remote server and install dependencies
       uses: appleboy/ssh-action@v0.1.7
       with:
-        host: 'ubuntu@${{ steps.tf-outputs.outputs.dot_server_ip }}'
+        host: ${{ steps.tf-outputs.outputs.dot_server_ip }}
         username: ubuntu
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: "22"
