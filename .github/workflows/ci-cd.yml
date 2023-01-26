@@ -206,15 +206,15 @@ jobs:
           aws s3 ls s3://dot-bucket-1234567890
 
     
-    - uses: shallwefootball/s3-upload-action@master
-        name: Upload S3
-        id: S3
-        with:
-          aws_key_id: ${{ secrets.AWS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          aws_bucket: dot-bucket-1234567890
-          source_dir: 'bootstrap'  
-          destination_dir: ''  
+    # - uses: shallwefootball/s3-upload-action@master
+      #   name: Upload S3
+      #   id: S3
+        # with:
+         #  aws_key_id: ${{ secrets.AWS_KEY_ID }}
+         #  aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+         #  aws_bucket: dot-bucket-1234567890
+         #  source_dir: 'bootstrap'  
+         #  destination_dir: ''  
 
     - name: Update deployment status (success)
       if: success()
