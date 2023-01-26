@@ -124,8 +124,9 @@ jobs:
         path: infra/instance/
       env:
         TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TERRAFORM_API_TOKEN}}
-    - name: Print the server_dns
+    - name: save server_dns
       run: server_dns = ${{ steps.tf-outputs.outputs.dot_server_dns }}
+    - name: Print the server_dns
       run: echo "The server_dns is ${{ steps.tf-outputs.outputs.dot_server_dns }}"
     - name: Print the bucket_id
       run: echo "The bucket_id is ${{ steps.tf-outputs.outputs.dot_bucket_id }}"
