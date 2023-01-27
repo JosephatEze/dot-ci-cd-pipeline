@@ -185,7 +185,7 @@ jobs:
 
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
-          sudo .aws/install
+          sudo .aws/install -y
 
     - name: Execute SSH commmands on remote server and install dependencies
       uses: appleboy/ssh-action@v0.1.7
@@ -246,19 +246,3 @@ jobs:
             repo: context.repo.repo,
             body: output
           })
-
-     
-
-
-      # ======================================================
-      # tmate is a nice little utility that allows us to
-      # ssh to the server and execute commands
-      # on the server in case any of the steps above fail.
-      #
-      # Otherwise this step will not be executed.
-      # ======================================================
-    - name: Setup tmate session
-      if: ${{ failure() }}
-      uses: mxschmitt/action-tmate@v3
-
-     
