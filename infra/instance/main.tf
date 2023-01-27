@@ -124,7 +124,7 @@ resource "aws_eip_association" "eip_assoc" {
   allocation_id = aws_eip.dot-eip.id
 }
 
-resource "aws_instance" "dot_server" {
+resource "aws_instance" "dot_server1" {
   ami                    = var.base_ami_id
   instance_type          = "t2.micro"
   vpc_security_group_ids = ["sg-014e7d776fd09dab3"]
