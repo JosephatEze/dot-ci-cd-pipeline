@@ -85,14 +85,14 @@ jobs:
         port: '22'
         script: |
           #Install Ruby 2.0, Ruby Gem, Jekyll, awscli, on the server
-          sudo apt update -y
+          sudo apt update 
           #sudo apt install ruby-full -y
           sudo apt-get install ruby-full rubygems build-essential zlib1g-dev -y
-          gem install jekyll bundler 
+          sudo gem install jekyll bundler 
 
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
-          .aws/install -y
+          sudo ./aws/install
 
     - name: Execute SSH commmands on remote server and install dependencies
       uses: appleboy/ssh-action@v0.1.7
@@ -102,12 +102,13 @@ jobs:
         key: '${{ secrets.SSH_PRIVATE_KEY }}'
         port: '22'
         script: |
-          git clone git@github.com:twbs/bootstrap.git
+          git clone https://github.com/twbs/bootstrap.git
           cd bootstrap 
-          jekyll build
+          jekyll new _gh_pages
           cd _gh_pages
           echo ${{github.job}} > version.txt
           echo ${{github.run_number}} >> version.txt 
+          jekyll build
           cd ../../
           aws s3 cp bootstrap s3://dot-bucket-1234567890
           aws s3 ls s3://dot-bucket-1234567890
