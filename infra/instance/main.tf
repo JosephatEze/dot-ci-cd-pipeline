@@ -124,6 +124,7 @@ resource "aws_eip_association" "eip_assoc" {
   allocation_id = aws_eip.dot-eip.id
 }
 
+<<<<<<< HEAD
 resource "aws_instance" "dot_server1" {
   ami                    = var.base_ami_id
   instance_type          = "t2.micro"
@@ -135,6 +136,8 @@ resource "aws_instance" "dot_server1" {
   }
 }
 
+=======
+>>>>>>> 4538c1d (added iam role, instance profie etc)
 resource "aws_eip" "dot-eip" {
   vpc = true
 }
@@ -172,6 +175,71 @@ resource "aws_s3_bucket_policy" "public_read_access" {
 EOF
 }
 
+#Create an IAM Policy
+resource "aws_iam_policy" "s3-policy" {
+  name        = "S3-Bucket-Access-Policy"
+  description = "Provides permission to access S3"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:*",
+        ]
+        Effect   = "Allow"
+        Resource = [
+
+          "${aws_s3_bucket.dot-bucket.arn}",
+          "${aws_s3_bucket.dot-bucket.arn}/*"]
+      },
+    ]
+  })
+}
+
+#Create an IAM Role
+resource "aws_iam_role" "dot_server-role" {
+  name = "ec2_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = "RoleForEC2"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "s3-policy-attach" {
+  name       = "policy-attachment"
+  roles      = [aws_iam_role.dot_server-role.name]
+  policy_arn = aws_iam_policy.s3-policy.arn
+}
+
+#Create an instance profile using role
+resource "aws_iam_instance_profile" "dot_server_profile" {
+  name = "server_profile"
+  role = aws_iam_role.dot_server-role.name
+}
+
+resource "aws_instance" "dot_server" {
+  ami                    = var.base_ami_id
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = ["sg-014e7d776fd09dab3"]
+  key_name               = var.public_key          
+  subnet_id              = "subnet-001e3a483390007de"
+  iam_instance_profile = aws_iam_instance_profile.dot_server_profile.name
+
+  tags = {"Name" = "dot_server"
+  }
+}
+
 output "dot_server_dns" {
   value = aws_instance.dot_server.public_dns
 }
@@ -183,4 +251,8 @@ output "dot_bucket_domain_name" {
 }
 output "dot_bucket_website_endpoint" {
   value = aws_s3_bucket.dot-bucket.website_endpoint 
+}
+
+output "dot_server_ip" {
+  value = aws_instance.dot_server.public_ip
 }
