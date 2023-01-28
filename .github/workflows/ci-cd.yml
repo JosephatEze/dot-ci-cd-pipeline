@@ -189,7 +189,7 @@ jobs:
           const output = `#### server created
            > job ${{ github.run_id }} has been deployed successfully
         
-          URL: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }};
+          URL: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }},
 
           github.rest.issues.createComment({
             issue_number: ${{ github.run_id }},
