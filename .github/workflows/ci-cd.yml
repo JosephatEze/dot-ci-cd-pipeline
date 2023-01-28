@@ -84,6 +84,8 @@ jobs:
         sudo apt update 
         #sudo apt install ruby-full -y
         sudo apt-get install ruby-full rubygems build-essential zlib1g-dev -y
+        sudo gem install minima
+        sudo gem install jekyll-feed
         sudo gem install jekyll bundler 
 
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
