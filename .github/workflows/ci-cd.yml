@@ -88,7 +88,7 @@ jobs:
 
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
         unzip awscliv2.zip
-        sudo ./aws/install
+        sudo ./aws/install --update
     # ======================================================
     # clone repository and build with jekyll
     # ======================================================
@@ -154,8 +154,7 @@ jobs:
            #cd ../../
            #aws s3 cp bootstrap s3://dot-bucket-1234567890
            #aws s3 ls s3://dot-bucket-1234567890
-
-        
+    
     - uses: shallwefootball/s3-upload-action@master
       name: Upload S3
       id: S3
