@@ -119,30 +119,14 @@ resource "aws_security_group" "allow_ssh" {
   }
 }
 
-resource "aws_eip_association" "eip_assoc" {
-  instance_id   = aws_instance.dot_server.id
-  allocation_id = aws_eip.dot-eip.id
-}
-
-<<<<<<< HEAD
-resource "aws_instance" "dot_server1" {
-  ami                    = var.base_ami_id
-  instance_type          = "t2.micro"
-  vpc_security_group_ids = ["sg-014e7d776fd09dab3"]
-  key_name               = var.public_key          
-  subnet_id              = "subnet-001e3a483390007de"
-
-  tags = {"Name" = "dot_server"
-  }
-}
-
-=======
->>>>>>> 4538c1d (added iam role, instance profie etc)
 resource "aws_eip" "dot-eip" {
   vpc = true
 }
 
-
+resource "aws_eip_association" "eip_assoc" {
+  instance_id   = aws_instance.dot_server.id
+  allocation_id = aws_eip.dot-eip.id
+}
 
 resource "aws_s3_bucket" "dot-bucket" {
   bucket = var.BUCKET_ID
