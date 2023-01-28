@@ -76,53 +76,95 @@ jobs:
     # ======================================================
     # Install dependencies in the server
     # ======================================================
-    - name: Execute SSH commmands on remote server and install dependencies
-      uses: appleboy/ssh-action@v0.1.7
-      with:
-        host: '${{ steps.tf-outputs.outputs.dot_server_dns }}'
-        username: 'ubuntu'
-        key: '${{ secrets.SSH_PRIVATE_KEY }}'
-        port: '22'
-        script: |
-          #Install Ruby 2.0, Ruby Gem, Jekyll, awscli, on the server
-          sudo apt update 
-          #sudo apt install ruby-full -y
-          sudo apt-get install ruby-full rubygems build-essential zlib1g-dev -y
-          sudo gem install jekyll bundler 
+    - name: Install dependencies in the server
+      id: dependencies 
+      working-directory: ./
+      run: |
+        #Install Ruby 2.0, Ruby Gem, Jekyll, awscli, on the server
+        sudo apt update 
+        #sudo apt install ruby-full -y
+        sudo apt-get install ruby-full rubygems build-essential zlib1g-dev -y
+        sudo gem install jekyll bundler 
 
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install
+    # ======================================================
+    # clone repository and build with jekyll
+    # ======================================================
+    - name: clone repository and build with jekyll
+      id: clone
+      working-directory: ./
+      run: |
+        git clone https://github.com/twbs/bootstrap.git
+        cd bootstrap 
+        jekyll new _gh_pages
+        cd _gh_pages
+        echo ${{github.job}} > version.txt
+        echo ${{github.run_number}} >> version.txt 
+        jekyll build
+        cd ../../
+        ls
 
-    - name: Execute SSH commmands on remote server and install dependencies
-      uses: appleboy/ssh-action@v0.1.7
-      with:
-        host: '${{ steps.tf-outputs.outputs.dot_server_dns }}'
-        username: 'ubuntu'
-        key: '${{ secrets.SSH_PRIVATE_KEY }}'
-        port: '22'
-        script: |
-          git clone https://github.com/twbs/bootstrap.git
-          cd bootstrap 
-          jekyll new _gh_pages
-          cd _gh_pages
-          echo ${{github.job}} > version.txt
-          echo ${{github.run_number}} >> version.txt 
-          jekyll build
-          cd ../../
-          aws s3 cp bootstrap s3://dot-bucket-1234567890
-          aws s3 ls s3://dot-bucket-1234567890
+
+
+
+
+
+
+
+
+
+
+
+
+    # - name: Execute SSH commmands on remote server and install dependencies
+      # uses: appleboy/ssh-action@v0.1.7
+      # with:
+        # host: '${{ steps.tf-outputs.outputs.dot_server_dns }}'
+        # username: 'ubuntu'
+        # key: '${{ secrets.SSH_PRIVATE_KEY }}'
+        # port: '22'
+        # script: |
+          # #Install Ruby 2.0, Ruby Gem, Jekyll, awscli, on the server
+           #sudo apt update 
+          #  #sudo apt install ruby-full -y
+         #  sudo apt-get install ruby-full rubygems build-essential zlib1g-dev -y
+         #  sudo gem install jekyll bundler 
+
+          # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+         #  unzip awscliv2.zip
+          # sudo ./aws/install
+
+     #- name: Execute SSH commmands on remote server and install dependencies
+     #  uses: appleboy/ssh-action@v0.1.7
+       #with:
+        # host: '${{ steps.tf-outputs.outputs.dot_server_dns }}'
+        # username: 'ubuntu'
+        # key: '${{ secrets.SSH_PRIVATE_KEY }}'
+        # port: '22'
+        # script: |
+          # git clone https://github.com/twbs/bootstrap.git
+          # cd bootstrap 
+          # jekyll new _gh_pages
+          # cd _gh_pages
+          # echo ${{github.job}} > version.txt
+          # echo ${{github.run_number}} >> version.txt 
+           #jekyll build
+           #cd ../../
+           #aws s3 cp bootstrap s3://dot-bucket-1234567890
+           #aws s3 ls s3://dot-bucket-1234567890
 
         
-        # - uses: shallwefootball/s3-upload-action@master
-          #   name: Upload S3
-          #   id: S3
-            # with:
-            #  aws_key_id: ${{ secrets.AWS_KEY_ID }}
-            #  aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-            #  aws_bucket: dot-bucket-1234567890
-            #  source_dir: 'bootstrap'  
-            #  destination_dir: ''  
+    - uses: shallwefootball/s3-upload-action@master
+      name: Upload S3
+      id: S3
+      with:
+        aws_key_id: ${{ secrets.AWS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+        aws_bucket: dot-bucket-1234567890
+        source_dir: 'bootstrap'  
+        destination_dir: ''  
 
         #- name: Update deployment status (success)
         # if: success()
