@@ -140,18 +140,18 @@ jobs:
       if: success()
       uses: actions/github-script@v5
       env:
-        output: "bucket url\n${{ steps.tf-outputs.outputs.stdout }}"
+        URL: "bucket url\n${{ steps.tf-outputs.outputs.stdout }}"
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
         script: |
-          <details><summary>Show Plan</summary>
+          #<details><summary>Show url</summary>
 
           \`\`\`\n
-          ${process.env.output}
+          ${process.env.URL}
           \`\`\`
 
-          </details>
+          #</details>
 
           *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
           const output = `#### server created and deployed successfully
