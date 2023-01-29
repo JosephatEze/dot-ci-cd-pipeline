@@ -142,7 +142,7 @@ jobs:
       env:
         URL: "bucket url\n${{ steps.tf-outputs.outputs.stdout }}"
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ secrets.TOKEN_GITHUB }}
 
         script: |
           #<details><summary>Show url</summary>
@@ -156,7 +156,7 @@ jobs:
           *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
           const output = `#### server created and deployed successfully
         
-          URL: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }};
+          BUCKET URL ENDPOINT: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }};
 
           github.rest.issues.createComment({
             issue_number: ${{ github.run_id }},
