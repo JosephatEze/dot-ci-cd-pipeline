@@ -101,9 +101,9 @@ jobs:
         port: '22'
         script: |
           rm -rf bootstrap 
-          git clone https://github.com/twbs/bootstrap.git || git pull
+          git clone https://github.com/twbs/bootstrap.git 
           cd bootstrap 
-          jekyll new _gh_pages --force
+          jekyll new _gh_pages 
           cd _gh_pages
           echo "Github Action name: ${{github.job}}" > version.txt
           echo "Github Action build number: ${{github.run_number}}" >> version.txt 
