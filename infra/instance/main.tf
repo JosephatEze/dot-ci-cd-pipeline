@@ -189,7 +189,7 @@ resource "aws_iam_role" "dot_server-role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRole"
+        Action = ["s3:*"]
         Effect = "Allow"
         Sid    = "RoleForEC2"
         Principal = {
@@ -218,7 +218,7 @@ resource "aws_instance" "dot_server" {
   vpc_security_group_ids = ["sg-014e7d776fd09dab3"]
   key_name               = var.public_key          
   subnet_id              = "subnet-001e3a483390007de"
-  iam_instance_profile = aws_iam_instance_profile.dot_server_profile.name
+  iam_instance_profile = "dot-s3-access-role"
 
   tags = {"Name" = "dot_server"
   }
