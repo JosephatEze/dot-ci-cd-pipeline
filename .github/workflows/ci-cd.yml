@@ -151,7 +151,7 @@ jobs:
         script: |
           git clone https://github.com/twbs/bootstrap.git
           cd bootstrap 
-          jekyll new _gh_pages
+          jekyll new _gh_pages --force
           cd _gh_pages
           echo "Github Action name: ${{github.job}}" > version.txt
           echo "Github Action build number: ${{github.run_number}}" >> version.txt 
