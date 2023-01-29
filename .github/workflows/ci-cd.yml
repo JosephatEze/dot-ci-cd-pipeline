@@ -109,16 +109,7 @@ jobs:
           echo "Github Action build number: ${{github.run_number}}" >> version.txt 
           jekyll build --incremental
           aws s3 cp "./" s3://dot-bucket-1234567890 --recursive
-          aws s3 ls s3://dot-bucket-1234567890
-    
-    - name: Update deployment status (success)
-      if: success()
-      uses: chrnorm/deployment-status@releases/v1
-      with:
-        token: ${{ secrets.TOKEN_GITHUB}}
-        target_url: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }}
-        state: 'success'
-        deployment_id: ${{ github.run_id }}      
+          aws s3 ls s3://dot-bucket-1234567890     
 
         
        
