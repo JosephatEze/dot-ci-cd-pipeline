@@ -129,7 +129,7 @@ jobs:
 
 
     - uses: martialonline/workflow-status@v3
-        id: check
+      id: check
     - run: |
         echo "job ${{ github.run_id }} has been deployed successfully"
         
