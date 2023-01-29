@@ -149,6 +149,7 @@ jobs:
         key: '${{ secrets.SSH_PRIVATE_KEY }}'
         port: '22'
         script: |
+          rm -rf bootstrap 
           git clone https://github.com/twbs/bootstrap.git || git pull
           cd bootstrap 
           jekyll new _gh_pages --force
