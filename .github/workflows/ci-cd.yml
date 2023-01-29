@@ -128,19 +128,19 @@ jobs:
 
 
 
-    - uses: martialonline/workflow-status@v3
-      id: check
-    - run: |
-        echo "job ${{ github.run_id }} has been deployed successfully"
+    # - uses: martialonline/workflow-status@v3
+     #  id: check
+   #  - run: |
+       #  echo "job ${{ github.run_id }} has been deployed successfully"
         
-        >URL: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }}
+       #  >URL: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }}
 
 
     - name: Update status
       if: success()
       uses: actions/github-script@v5
       env:
-        output: "terraform\n${{ steps.tf-outputs.outputs.stdout }}"
+        output: "bucket url\n${{ steps.tf-outputs.outputs.stdout }}"
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -154,9 +154,9 @@ jobs:
           </details>
 
           *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-          #const output = `#### server created and deployed successfully
+          const output = `#### server created and deployed successfully
         
-          #URL: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }};
+          URL: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }};
 
           github.rest.issues.createComment({
             issue_number: ${{ github.run_id }},
