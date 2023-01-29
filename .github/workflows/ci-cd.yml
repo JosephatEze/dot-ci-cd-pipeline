@@ -111,57 +111,18 @@ jobs:
           aws s3 cp "./" s3://dot-bucket-1234567890 --recursive
           aws s3 ls s3://dot-bucket-1234567890
     
-     #- name: Update deployment status (success)
-      # if: success()
-      # uses: chrnorm/deployment-status@releases/v1
-      # with:
-       #  token: ${{ secrets.GITHUB_TOKEN }}
-       #  target_url: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }}
-        # state: 'success'
-        # deployment_id: ${{ github.run_id }}      
-
-        
-        # ======================================================
-        # When we're done, we need to update the PR one more time
-        # with the results of the apply.
-        # ======================================================  
-
-
-
-    # - uses: martialonline/workflow-status@v3
-     #  id: check
-   #  - run: |
-       #  echo "job ${{ github.run_id }} has been deployed successfully"
-        
-       #  >URL: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }}
-
-
-    - name: Update status
+    - name: Update deployment status (success)
       if: success()
-      uses: actions/github-script@v5
-      env:
-        URL: "bucket url\n${{ steps.tf-outputs.outputs.stdout }}"
+      uses: chrnorm/deployment-status@releases/v1
       with:
-        github-token: ${{ secrets.TOKEN_GITHUB }}
+        token: ${{ secrets.TOKEN_GITHUB}}
+        target_url: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }}
+        state: 'success'
+        deployment_id: ${{ github.run_id }}      
 
-        script: |
-          #<details><summary>Show url</summary>
-
-          \`\`\`\n
-          ${process.env.URL}
-          \`\`\`
-
-          #</details>
-
-          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-          const output = `#### server created and deployed successfully
         
-          BUCKET URL ENDPOINT: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }};
+       
 
-          github.rest.issues.createComment({
-            issue_number: ${{ github.run_id }},
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: output
-          });
+
+   
           
