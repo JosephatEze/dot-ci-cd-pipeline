@@ -1,10 +1,9 @@
 name: Dot CI-CD pipeline
-
 on:
   workflow_dispatch:
 
 jobs:
-  create:
+  create_server:
     name: 'Create and configure ec2 instance'
     defaults:
       run:
@@ -72,54 +71,6 @@ jobs:
       run: echo "Thebucket_domain_name is ${{ steps.tf-outputs.outputs.dot_bucket_domain_name}}"
     - name: Print the bucket_website_endpoint
       run: echo "The bucket_website_endpoint is ${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }}"
-    
-    # ======================================================
-    # Install dependencies in the server
-    # ======================================================
-    #- name: Install dependencies in the server
-      #id: dependencies 
-     # working-directory: ./
-     # run: |
-      #  #Install Ruby 2.0, Ruby Gem, Jekyll, awscli, on the server
-      #  sudo apt update 
-      #  #sudo apt install ruby-full -y
-       # sudo apt-get install ruby-full rubygems build-essential zlib1g-dev -y
-      #  sudo gem install minima
-      #  sudo gem install jekyll-feed
-      #  sudo gem install jekyll bundler 
-
-       # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-       # unzip awscliv2.zip
-      #  sudo ./aws/install --update
-   # # ======================================================
-   # # clone repository and build with jekyll
-   # # ======================================================
-   # - name: clone repository and build with jekyll
-    #  id: clone
-    #  working-directory: ./
-    #  run: |
-     #   git clone https://github.com/twbs/bootstrap.git
-      #  cd bootstrap 
-     #   jekyll build
-      #  #jekyll new _gh_pages
-      #  cd _gh_pages
-       # echo ${{github.job}} > version.txt
-       # echo ${{github.run_number}} >> version.txt 
-        
-       # cd ../../
-       # ls
-
-
-
-
-
-
-
-
-
-
-
-
 
     - name: Execute SSH commmands on remote server and install dependencies
       uses: appleboy/ssh-action@v0.1.7
@@ -141,7 +92,7 @@ jobs:
           unzip awscliv2.zip
           sudo ./aws/install --update
 
-    - name: Execute SSH commmands on remote server and install dependencies
+    - name: Execute SSH commmands on remote server, clone repo and build 
       uses: appleboy/ssh-action@v0.1.7
       with:
         host: '${{ steps.tf-outputs.outputs.dot_server_dns }}'
@@ -160,24 +111,14 @@ jobs:
           aws s3 cp "./" s3://dot-bucket-1234567890 --recursive
           aws s3 ls s3://dot-bucket-1234567890
     
-    #- uses: shallwefootball/s3-upload-action@master
-     # name: Upload S3
-      #id: S3
-      #with:
-        #aws_key_id: ${{ secrets.AWS_KEY_ID }}
-        #aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-        #aws_bucket: dot-bucket-1234567890
-        #source_dir: 'bootstrap'  
-        #destination_dir: ''  
-
-        #- name: Update deployment status (success)
-        # if: success()
-          #uses: chrnorm/deployment-status@releases/v1
-        #  with:
-          #  token: ${{ secrets.GITHUB_TOKEN }}
-          #  target_url: https://${{ steps.tf-outputs.outputs.dot_server_dns }}
-        #   state: 'success'
-            #deployment_id: ${{ steps.test.outputs.deployment_id }}      
+    - name: Update deployment status (success)
+      if: success()
+      uses: chrnorm/deployment-status@releases/v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        target_url: http://${{ steps.tf-outputs.outputs.dot_server_dns }}
+        state: 'success'
+        deployment_id: ${{ steps.test.outputs.deployment_id }}      
 
         
         # ======================================================
