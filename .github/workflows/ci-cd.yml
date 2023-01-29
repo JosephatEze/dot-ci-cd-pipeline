@@ -157,7 +157,7 @@ jobs:
           echo "Github Action name: ${{github.job}}" > version.txt
           echo "Github Action build number: ${{github.run_number}}" >> version.txt 
           jekyll build --incremental
-          aws s3 cp . s3://dot-bucket-1234567890
+          aws s3 cp "./" s3://dot-bucket-1234567890 --recursive
           aws s3 ls s3://dot-bucket-1234567890
     
     #- uses: shallwefootball/s3-upload-action@master
