@@ -4,7 +4,7 @@ on:
 
 jobs:
   create_server:
-    name: 'Create and configure ec2 instance'
+    name: 'Create ec2 and s3 bucket for deployment'
     defaults:
       run:
         shell: bash
@@ -92,7 +92,7 @@ jobs:
           unzip awscliv2.zip
           sudo ./aws/install --update
 
-    - name: Execute SSH commmands on remote server, clone repo and build 
+    - name: Execute SSH commmands on remote server, clone repo, build and copy to s3 bucket 
       uses: appleboy/ssh-action@v0.1.7
       with:
         host: '${{ steps.tf-outputs.outputs.dot_server_dns }}'
@@ -109,11 +109,4 @@ jobs:
           echo "Github Action build number: ${{github.run_number}}" >> version.txt 
           jekyll build --incremental
           aws s3 cp "./" s3://dot-bucket-1234567890 --recursive
-          aws s3 ls s3://dot-bucket-1234567890     
-
-        
-       
-
-
-   
-          
+          aws s3 ls s3://dot-bucket-1234567890            
