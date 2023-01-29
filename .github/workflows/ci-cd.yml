@@ -133,7 +133,7 @@ jobs:
     - run: |
         echo "job ${{ github.run_id }} has been deployed successfully"
         
-        URL: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }}
+        >URL: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }}
 
 
     - name: Update status
