@@ -126,7 +126,7 @@ jobs:
         # with the results of the apply.
         # ======================================================      
     - name: Update status
-      if: success()
+      if: success(){
       uses: actions/github-script@v5
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -142,3 +142,4 @@ jobs:
             repo: context.repo.repo,
             body: output
           })
+          }
