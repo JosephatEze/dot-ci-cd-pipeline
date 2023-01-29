@@ -183,19 +183,19 @@ jobs:
         # When we're done, we need to update the PR one more time
         # with the results of the apply.
         # ======================================================      
-    - name: Update status
-      uses: actions/github-script@v5
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const output = `#### server created
-           > job ${{ github.run_id }} has been deployed successfully
+    #- name: Update status
+    #  uses: actions/github-script@v5
+    #  with:
+    #    github-token: ${{ secrets.GITHUB_TOKEN }}
+    #    script: |
+    #      const output = `#### server created
+    #       > job ${{ github.run_id }} has been deployed successfully
         
-          URL: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }},
+    #      URL: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }},
 
-          github.rest.issues.createComment({
-            issue_number: ${{ github.run_id }},
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: output
-          })
+    #      github.rest.issues.createComment({
+    #        issue_number: ${{ github.run_id }},
+    #        owner: context.repo.owner,
+    #        repo: context.repo.repo,
+    #        body: output
+    #      })
