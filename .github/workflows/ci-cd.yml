@@ -130,7 +130,7 @@ jobs:
 
     - uses: martialonline/workflow-status@v3
         id: check
-      - run: |
+    - run: |
         echo "job ${{ github.run_id }} has been deployed successfully"
         
         URL: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }}
