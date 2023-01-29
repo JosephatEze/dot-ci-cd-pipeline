@@ -116,9 +116,9 @@ jobs:
       uses: chrnorm/deployment-status@releases/v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        target_url: http://${{ steps.tf-outputs.outputs.dot_server_dns }}
+        target_url: http://${{ steps.tf-outputs.outputs.dot_bucket_website_endpoint }}
         state: 'success'
-        deployment_id: ${{ steps.test.outputs.deployment_id }}      
+        deployment_id: ${{ github.run_id }}      
 
         
         # ======================================================
