@@ -141,9 +141,9 @@ jobs:
           unzip awscliv2.zip
           sudo ./aws/install --update
 
-     - name: Execute SSH commmands on remote server and install dependencies
-       uses: appleboy/ssh-action@v0.1.7
-       with:
+    - name: Execute SSH commmands on remote server and install dependencies
+      uses: appleboy/ssh-action@v0.1.7
+      with:
         host: '${{ steps.tf-outputs.outputs.dot_server_dns }}'
         username: 'ubuntu'
         key: '${{ secrets.SSH_PRIVATE_KEY }}'
