@@ -119,6 +119,6 @@ jobs:
         key: '${{ secrets.SSH_PRIVATE_KEY }}'
         port: '22'
         script: |
-          cd bootstrap 
+          cd bootstrap/_gh_pages
           aws s3 cp "./" s3://dot-bucket-1234567890 --exclude "./git*" --recursive
           aws s3 ls s3://dot-bucket-1234567890            
