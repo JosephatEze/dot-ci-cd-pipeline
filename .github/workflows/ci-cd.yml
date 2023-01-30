@@ -92,7 +92,7 @@ jobs:
           unzip awscliv2.zip
           sudo ./aws/install --update
 
-    - name: Execute SSH commmands on remote server, clone repo, build and copy to s3 bucket 
+    - name: Execute SSH commmands on remote server, clone repo, and build
       uses: appleboy/ssh-action@v0.1.7
       with:
         host: '${{ steps.tf-outputs.outputs.dot_server_dns }}'
